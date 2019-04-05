@@ -54,3 +54,5 @@ def signin(request):
         return redirect("/admin/")
 
     return render(request, "index.html")
+def manager(request):
+    return render(request,'managerindex.html')
