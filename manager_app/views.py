@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from manager_app.models import Managerinfo
-from manager_app.forms import  ManagerForm
+from manager_app.forms import  ManagerForm,DepartmentForm
 import authorised as au
 
 def index(request):
@@ -56,3 +56,15 @@ def signin(request):
     return render(request, "index.html")
 def manager(request):
     return render(request,'managerindex.html')
+def createdepartment(request):
+    if request.method=="POST":
+        form=DepartmentForm(request.POST)
+        if form.is_valid():
+            f=form.save(commit=False)
+            f.department_name=request.POST['department_name']
+            f.department_strength=request.POST['department_strength']
+            f.department_location=request.POST['department_location']
+            f.department_head=request.POST['department_head']
+            f.save()
+            return render(request,"createdepartment.html",{'success':True})
+    return render(request,"createdepartment.html")

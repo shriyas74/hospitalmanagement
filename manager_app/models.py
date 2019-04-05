@@ -18,3 +18,10 @@ class Managerinfo(models.Model):
     isavailable = models.BooleanField(default=True)
     role_id = models.ForeignKey(UserRole, on_delete=models.CASCADE, default="")
     isqueue = models.BooleanField(default=True)
+
+class Department(models.Model):
+    department_id=models.AutoField(primary_key=True)
+    department_name=models.CharField(max_length=225)
+    department_strength=models.IntegerField(null=True)
+    department_location=models.CharField(max_length=225)
+    department_head=models.CharField(max_length=225)
