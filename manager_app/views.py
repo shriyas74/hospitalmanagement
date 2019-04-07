@@ -4,6 +4,24 @@ from manager_app.forms import  ManagerForm,DepartmentForm
 import authorised as au
 
 def index(request):
+    if request.method == "POST":
+        try:
+
+            email=request.POST['email']
+            data=Managerinfo.objects.get(email=email)
+            password1=data.password
+            password2=request.POST['password']
+        except:
+            return render(request,"index.html",{'wrnguname':True})
+
+        if(password1==password2):
+            request.session['email']=data.email
+            request.session['authenticated']=True
+            request.session['roleid']=data.role_id_id
+            if(request.session['roleid']==3):
+                return redirect("/manager/")
+
+
     return render(request, "index.html")
 
 
