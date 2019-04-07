@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from manager_app.models import Managerinfo
+from manager_app.models import Managerinfo,Department
 from manager_app.forms import  ManagerForm,DepartmentForm
 import authorised as au
 
@@ -68,3 +68,23 @@ def createdepartment(request):
             f.save()
             return render(request,"createdepartment.html",{'success':True})
     return render(request,"createdepartment.html")
+def viewdepartment(request):
+    data=Department.objects.all()
+    return render(request,"viewdepartment.html",{'data':data})
+def deletedepartment(request):
+    id=request.GET['id']
+    data=Department.objects.get(department_id=id)
+    data.delete()
+    return render(request,"viewdepartment.html")
+def updatedepartment(request):
+    id=request.GET['id']
+    data=Department.objects.get(department_id=id)
+    if request.method=="POST":
+        dname=request.POST['department_name']
+        dstrength=request.POST['department_strength']
+        dlocation=request.POST['department_location']
+        dhead=request.POST['department_head']
+        update=Department(department_id=id,department_name=dname,department_strength=dstrength,department_location=dlocation,department_head=dhead)
+        update.save(update_fields=['department_name','department_strength','department_location','department_head'])
+        return redirect("/viewdepartment/")
+    return render(request,"updatedepartment.html",{'ddata':data})
