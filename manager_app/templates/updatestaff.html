@@ -33,15 +33,15 @@
                 </tr>
                 <tr>
                     <td>Member DOB</td>
-                    <td><input type="date" name="member_dob" id="member_dob" value="{{ mdata.member_dob }}">{{mdata.member_dob}}</td>
+                    <td><input type="date" name="member_dob" id="member_dob" value="">{{mdata.member_dob}}</td>
                 </tr>
                 <tr>
                     <td>Member Gender</td>
-                    {% if i.member_gender == "Male" %}
+                    {% if gender == True %}
                     <td><input type="radio" name="member_gender" id="member_gender" value="Male" checked="true">Male
-                    <input type="radio" name="member_gender" id="member_gender1" value="Female">Female</td>
+                    <input type="radio" name="member_gender" value="female" id="member_gender1">Female</td>
                     {%else%}
-                    <td><input type="radio" name="member_gender" id="member_gender2" value="Male">Male
+                    <td><input type="radio" name="member_gender" value = "male" id="member_gender2">Male
                     <input type="radio" name="member_gender" id="member_gender3" value="Female" checked="true">Female</td>
                     {%endif%}
                 </tr>
