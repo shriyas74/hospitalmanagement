@@ -19,7 +19,7 @@ def index(request):
             request.session['email']=data.email
             request.session['authenticated']=True
             request.session['roleid']=data.role_id_id
-            if(request.session['roleid']==3):
+            if(request.session['roleid']==1):
                 return redirect("/manager/")
         else:
             return render(request,"index.html",{'wrngpass':True})
@@ -166,4 +166,8 @@ def updatemember(request):
     id=request.GET['id']
 
     mdata=Member.objects.get(member_id=id)
-    return render(request,"updatestaff.html",{'mdata':mdata})
+    if mdata.member_gender == "Male":
+        return render(request, "updatestaff.html", {'mdata': mdata,"gender":True})
+    else:
+        return render(request, "updatestaff.html", {'mdata': mdata})
+
