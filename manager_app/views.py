@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
-from manager_app.models import Managerinfo,Department
-from manager_app.forms import  ManagerForm,DepartmentForm
+from manager_app.models import Managerinfo,Department,Member,UserRole
+from manager_app.forms import  ManagerForm,DepartmentForm,MemberForm
+from django.core.files.storage import FileSystemStorage
 import authorised as au
 
 def index(request):
@@ -20,6 +21,8 @@ def index(request):
             request.session['roleid']=data.role_id_id
             if(request.session['roleid']==3):
                 return redirect("/manager/")
+        else:
+            return render(request,"index.html",{'wrngpass':True})
 
 
     return render(request, "index.html")
@@ -106,3 +109,56 @@ def updatedepartment(request):
         update.save(update_fields=['department_name','department_strength','department_location','department_head'])
         return redirect("/viewdepartment/")
     return render(request,"updatedepartment.html",{'ddata':data})
+def addstaff(request):
+    department=Department.objects.all()
+    if request.method=="POST":
+        memberimage=None
+        if request.FILES:
+            myfile=request.FILES['member_photo']
+            fs=FileSystemStorage()
+            filename=fs.save(myfile.name,myfile)
+            memberimage=fs.url
+            memberimage=myfile.name
+        form=MemberForm(request.POST)
+        if form.is_valid:
+
+            f = form.save(commit=False)
+            name = request.POST['member_first_name']
+            name1 = request.POST['member_last_name']
+            address = request.POST['member_address']
+            user = UserRole.objects.all()
+            department=request.POST['member_department']
+            if(department=="Other"):
+                a=user.role_id_id=4
+            else:
+                a=user.role_id_id=1
+
+            length = str(len(name)) + str(len(name1)) + str(len(address))
+            password = str(name1) + str(length)
+            f.member_image = memberimage
+            f.member_first_name = request.POST['member_first_name']
+            f.member_last_name = request.POST['member_last_name']
+            f.member_address = request.POST['member_address']
+            f.member_phone = request.POST['member_phone']
+            f.member_email = request.POST['member_email']
+            f.member_dob = request.POST['member_dob']
+            f.member_gender = request.POST['member_gender']
+            f.member_status = True
+            f.role_id_id = a
+            f.member_password = password
+            f.member_department_id=department
+            f.save()
+            return render(request,"addstaff.html",{'success': True,'department': department})
+        else:
+            return render(request,"addstaff.html",{'failed': True,'department': department})
+
+    return render(request,"addstaff.html",{'department':department})
+
+def viewmember(request):
+    data=Member.objects.all()
+    return render(request,"viewstaff.html",{'mdata':data})
+def deletemember(request):
+    id=request.GET['id']
+    data=Member.objects.get(member_id=id)
+    data.delete()
+    return redirect("/viewstaff/")

@@ -25,3 +25,18 @@ class Department(models.Model):
     department_strength=models.IntegerField(null=True)
     department_location=models.CharField(max_length=225)
     department_head=models.CharField(max_length=225)
+
+class Member(models.Model):
+    role_id=models.ForeignKey(UserRole,on_delete=models.CASCADE,default="",null=True)
+    member_id=models.AutoField(primary_key=True)
+    member_first_name=models.CharField(default="",max_length=224,null=True)
+    member_last_name=models.CharField(default="",max_length=225,null=True)
+    member_address=models.CharField(default="",max_length=224)
+    member_email=models.EmailField(default="",max_length=224)
+    member_phone=models.CharField(default="",max_length=225)
+    member_image=models.CharField(default="",max_length=225,null=True)
+    member_gender=models.CharField(default="",max_length=225)
+    member_status=models.BooleanField(default=True)
+    member_dob=models.DateField(null=True)
+    member_password=models.CharField(null=True,max_length=225)
+    member_department=models.ForeignKey(Department,on_delete=models.CASCADE,default="",null=True)
