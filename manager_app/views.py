@@ -162,3 +162,8 @@ def deletemember(request):
     data=Member.objects.get(member_id=id)
     data.delete()
     return redirect("/viewstaff/")
+def updatemember(request):
+    id=request.GET['id']
+
+    mdata=Member.objects.get(member_id=id)
+    return render(request,"updatestaff.html",{'mdata':mdata})
