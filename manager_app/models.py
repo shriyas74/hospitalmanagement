@@ -37,6 +37,6 @@ class Member(models.Model):
     member_image=models.CharField(default="",max_length=225,null=True)
     member_gender=models.CharField(default="",max_length=225)
     member_status=models.BooleanField(default=True)
-    member_dob=models.DateField(null=True)
+    member_dob=models.CharField(null=True,max_length=225,default="")
     member_password=models.CharField(null=True,max_length=225)
     member_department=models.ForeignKey(Department,on_delete=models.CASCADE,default="",null=True)

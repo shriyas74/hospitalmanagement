@@ -1,82 +1,43 @@
 from django.shortcuts import render,redirect
-from manager_app.models import Managerinfo,Department,Member,UserRole
-from manager_app.forms import  ManagerForm,DepartmentForm,MemberForm
+from manager_app.models import Department,Member,UserRole
+from manager_app.forms import DepartmentForm,MemberForm
 from django.core.files.storage import FileSystemStorage
-import authorised as au
+from django.db.models import Q
+import mail as m
+
 
 def index(request):
     if request.method == "POST":
         try:
-
             email=request.POST['email']
-            data=Managerinfo.objects.get(email=email)
-            password1=data.password
+            data=Member.objects.get(member_email=email)
+            password1=data.member_password
             password2=request.POST['password']
         except:
-            return render(request,"index.html",{'wrnguname':True})
+            return render(request,"index.html",{'wrnguname':True,'data':data})
 
         if(password1==password2):
-            request.session['email']=data.email
+            request.session['email']=data.member_email
             request.session['authenticated']=True
             request.session['roleid']=data.role_id_id
             if(request.session['roleid']==3):
                 return redirect("/manager/")
+            elif(request.session['roleid']==1):
+                return redirect("/doctor/")
+            elif (request.session['roleid'] == 4):
+                return redirect("/staff/")
         else:
             return render(request,"index.html",{'wrngpass':True})
-
-
     return render(request, "index.html")
-
-
-def manager_info(request):
-    if (request.method=="POST"):
-        form=ManagerForm(request.POST)
-        if form.is_valid():
-            f=form.save(commit=False)
-            f.name=request.POST['name']
-            f.email = request.POST['email']
-            f.Password = request.POST['c_password']
-            f.role_id_id = 4
-            f.save()
-            return render(request,"index1.html",{'inserted':True})
-        else:
-            return render(request,"index2.html")
-    return render(request, "index.html")
-    #try:
-     #   auth=au.authoriseuser(request.session["authenticated"],request.session["roleid"],1)
-    #except:
-
-     #   return redirect("/not login")
-    #if(auth):
-     #
-    #else:
-     #   aut,message=auth
-      #  if(message=="Wrong User"):
-       #     return redirect("/wrong user/")
-        #elif(message=="Not Login"):
-         #   return redirect("/not login/")
-
-
-#def logout(request):
- #   request.session['authenticated']=False
-  #  return render(request, "/")
-
-
-def signin(request):
-    if request.method=="POST":
-        uemail=request.POST["email"]
-        upassword=request.POST["password"]
-        userdata=Managerinfo.objects.get(user_email=uemail)
-        dp=userdata.user_passsword
-        if dp==upassword:
-            request.session['authenticated']=True
-            request.session['roleid']=userdata.role_id_id
-            request.session['useremail']=userdata.user_email
-        return redirect("/admin/")
-
-    return render(request, "index.html")
+def logout(request):
+    request.session['authenticated']=False
+    return redirect("/")
 def manager(request):
     return render(request,'managerindex.html')
+def doctor(request):
+    return render(request,'doctorindex.html')
+def staff(request):
+    return render(request,'staffindex.html')
 def createdepartment(request):
     if request.method=="POST":
         form=DepartmentForm(request.POST)
@@ -110,6 +71,7 @@ def updatedepartment(request):
         return redirect("/viewdepartment/")
     return render(request,"updatedepartment.html",{'ddata':data})
 def addstaff(request):
+
     department=Department.objects.all()
     if request.method=="POST":
         memberimage=None
@@ -148,6 +110,8 @@ def addstaff(request):
             f.member_password = password
             f.member_department_id=department
             f.save()
+            m.mail_sending(f.member_first_name, f.member_last_name, f.member_email, password)
+
             return render(request,"addstaff.html",{'success': True,'department': department})
         else:
             return render(request,"addstaff.html",{'failed': True,'department': department})
@@ -155,7 +119,7 @@ def addstaff(request):
     return render(request,"addstaff.html",{'department':department})
 
 def viewmember(request):
-    data=Member.objects.all()
+    data=Member.objects.filter(Q(role_id_id=1)| Q(role_id_id=4))
     return render(request,"viewstaff.html",{'mdata':data})
 def deletemember(request):
     id=request.GET['id']
@@ -164,6 +128,23 @@ def deletemember(request):
     return redirect("/viewstaff/")
 def updatemember(request):
     id=request.GET['id']
-
     mdata=Member.objects.get(member_id=id)
+    if request.method=="POST":
+        member_image=mdata.member_image
+        if request.FILES:
+            newfile=request.FILES['member_image']
+            fs=FileSystemStorage()
+            filename=fs.save(newfile.name,newfile)
+            member_image=fs.url(filename)
+            member_image=newfile.name
+        mname1=request.POST['member_first_name']
+        mname2=request.POST['member_last_name']
+        mimage=member_image
+        maddress=request.POST['member_address']
+        mphone=request.POST['member_phone']
+        mdob=request.POST['member_dob']
+        mgender=request.POST['member_gender']
+        update=Member(member_id=id,member_first_name=mname1,member_last_name=mname2,member_image=mimage,member_address=maddress,member_phone=mphone,member_dob=mdob,member_gender=mgender)
+        update.save(update_fields=['member_first_name','member_last_name','member_image','member_address','member_phone','member_dob','member_gender'])
+        return redirect("/viewstaff/")
     return render(request,"updatestaff.html",{'mdata':mdata})

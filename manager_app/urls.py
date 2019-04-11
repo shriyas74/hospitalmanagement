@@ -13,4 +13,7 @@ url(r'^addstaff/$',views.addstaff,name="addstaff"),
 url(r'^viewstaff/$',views.viewmember,name="viewstaff"),
 url(r'^deletestaff/$',views.deletemember,name="deletestaff"),
 url(r'^updatestaff/$',views.updatemember,name="updatestaff"),
+url(r'^doctor/$',views.doctor,name="doctorindex"),
+url(r'^staff/$',views.staff,name="staffindex"),
+url(r'^logout/$',views.logout,name="logout"),
 ]
